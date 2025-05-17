@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Default (Mobile-first: Phones AND Tablets - Fullscreen) --- */
+        body {
+            margin: 0;
+            padding: 0; /* Ensures no padding for full screen on phones/tablets */
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 100vh; /* Full viewport height for phones/tablets */
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Framed View (Desktops and very large screens) --- */
+        /* THIS IS THE LINE TO CHANGE to ensure tablets are fullscreen */
+        @media (min-width: 1400px) { /* <--- Increased from 1025px */
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .phone-frame {
+                aspect-ratio: 390 / 844;
+                border-radius: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                max-width: 100%;
+                max-height: 100%;
+                width: 390px; 
+                height: auto;
+                position: relative;
+                display: flex; /* Ensure these are still set */
+                flex-direction: column; /* Ensure these are still set */
+                overflow: hidden; /* Ensure these are still set */
+            }
+
+            @media (orientation: landscape) {
+                .phone-frame {
+                    height: 100%; 
+                    width: auto;  
+                }
+            }
+
+            /* Optional: Larger simulation frame for very wide desktops if 390px base is too small */
+            /* This would only apply if min-width is also >= 1400px AND this new min-width (e.g., 1600px) is met */
+            /*
+            @media (min-width: 1600px) { 
+                .phone-frame {
+                    width: 450px; 
+                }
+            }
+            */
+        }
+
+        /* --- Original styles for inner components --- */
+        .status-bar {
+            height: 44px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            text-decoration: none;
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .tab-item.active {
+            color: #007aff;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+
+
+
+
+<body>
+    <div class="phone-frame">
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">AI Coach</h1>
+                <div class="flex items-center">
+                    <div class="text-xs text-gray-500 mr-2">Updated today</div>
+                    <i class="fas fa-sync-alt text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- Intro Card -->
+            <div class="feedback-card p-4 mb-5">
+                <div class="flex">
+                    <div class="ai-avatar mr-3">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-semibold">Hello there!</h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            I've analyzed your recent workouts and have some insights to share with you.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Analysis Card -->
+            <h2 class="font-semibold text-lg mb-3">Weekly Analysis</h2>
+            <div class="feedback-card mb-5">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-start">
+                        <div class="flex-1">
+                            <h3 class="font-medium">Strength Progress</h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                You're making consistent progress in your key lifts this month.
+                            </p>
+                        </div>
+                        <div class="bg-green-50 text-green-600 text-xs font-medium px-2 py-1 rounded-full">
+                            +7.2%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="chart-container mb-3">
+                        <!-- Chart Grid -->
+                        <div class="chart-grid">
+                            <div class="chart-h-line" style="bottom: 25%"></div>
+                            <div class="chart-h-line" style="bottom: 50%"></div>
+                            <div class="chart-h-line" style="bottom: 75%"></div>
+                            
+                            <div class="chart-axis-label" style="bottom: -5px; left: 0%">Mar 1</div>
+                            <div class="chart-axis-label" style="bottom: -5px; left: 25%">Mar 8</div>
+                            <div class="chart-axis-label" style="bottom: -5px; left: 50%">Mar 15</div>
+                            <div class="chart-axis-label" style="bottom: -5px; left: 75%">Mar 22</div>
+                            <div class="chart-axis-label" style="bottom: -5px; left: 100%; transform: translateX(-100%)">Today</div>
+                        </div>
+                        
+                        <!-- Chart Line -->
+                        <div class="chart-line"></div>
+                        
+                        <!-- Chart Dots -->
+                        <div class="chart-dots">
+                            <div class="chart-dot" style="bottom: 35%; left: 0%"></div>
+                            <div class="chart-dot" style="bottom: 55%; left: 20%"></div>
+                            <div class="chart-dot" style="bottom: 45%; left: 40%"></div>
+                            <div class="chart-dot" style="bottom: 50%; left: 60%"></div>
+                            <div class="chart-dot" style="bottom: 65%; left: 80%"></div>
+                            <div class="chart-dot" style="bottom: 70%; left: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600">Bench Press 1RM (estimated)</span>
+                                <span class="font-medium">195 lbs <span class="text-green-500">(+10 lbs)</span></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill bg-blue-500" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600">Squat 1RM (estimated)</span>
+                                <span class="font-medium">285 lbs <span class="text-green-500">(+15 lbs)</span></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill bg-green-500" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600">Deadlift 1RM (estimated)</span>
+                                <span class="font-medium">315 lbs <span class="text-green-500">(+20 lbs)</span></span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill bg-purple-500" style="width: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Feedback Cards -->
+            <h2 class="font-semibold text-lg mb-3">Personalized Insights</h2>
+            
+            <!-- Insight 1 -->
+            <div class="feedback-card mb-4 p-4">
+                <h3 class="font-medium text-blue-600 mb-2">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Chest Development
+                </h3>
+                <p class="text-sm text-gray-700 mb-3">
+                    Your bench press volume increased by 12% this week. This consistent progression is excellent for hypertrophy.
+                </p>
+                <p class="text-sm text-gray-700">
+                    <span class="font-medium">Recommendation:</span> Consider adding an extra incline chest movement to target upper pectorals more effectively.
+                </p>
+            </div>
+            
+            <!-- Insight 2 -->
+            <div class="feedback-card mb-4 p-4">
+                <h3 class="font-medium text-green-600 mb-2">
+                    <i class="fas fa-heartbeat mr-2"></i>
+                    Recovery Pattern
+                </h3>
+                <p class="text-sm text-gray-700 mb-3">
+                    I've noticed your rest times between sets are consistent (averaging 2:05). This is optimal for your current strength goals.
+                </p>
+                <p class="text-sm text-gray-700">
+                    <span class="font-medium">Recommendation:</span> Your recovery pattern looks good. Continue maintaining 48-72 hours between training the same muscle groups.
+                </p>
+            </div>
+            
+            <!-- Insight 3 -->
+            <div class="feedback-card mb-4 p-4">
+                <h3 class="font-medium text-yellow-600 mb-2">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Muscle Imbalance Alert
+                </h3>
+                <p class="text-sm text-gray-700 mb-3">
+                    Your pull-to-push ratio is slightly lower than optimal (0.7:1 vs. recommended 1:1).
+                </p>
+                <p class="text-sm text-gray-700">
+                    <span class="font-medium">Recommendation:</span> Consider adding more rowing movements to your pull days to balance your development and prevent potential shoulder issues.
+                </p>
+            </div>
+            
+            <!-- Insight 4 -->
+            <div class="feedback-card mb-5 p-4">
+                <h3 class="font-medium text-purple-600 mb-2">
+                    <i class="fas fa-dumbbell mr-2"></i>
+                    Workout Intensity
+                </h3>
+                <p class="text-sm text-gray-700 mb-3">
+                    Based on your recent sets, you're working at approximately 75-85% of your maximum capacity, which is ideal for strength building.
+                </p>
+                <p class="text-sm text-gray-700">
+                    <span class="font-medium">Recommendation:</span> Try implementing one heavy set (90-95% intensity) per main compound lift to stimulate additional strength gains.
+                </p>
+            </div>
+            
+            <!-- Weekly Training Plan -->
+            <div class="feedback-card mb-5">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-medium">Suggested Weekly Plan</h3>
+                    <p class="text-sm text-gray-600 mt-1">Based on your goals and recovery patterns</p>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            M
+                        </div>
+                        <div>
+                            <p class="font-medium">Push Day</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Chest, shoulders, triceps</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            T
+                        </div>
+                        <div>
+                            <p class="font-medium">Pull Day</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Back, biceps, rear delts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-gray-100 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            W
+                        </div>
+                        <div>
+                            <p class="font-medium">Rest/Light Cardio</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Recovery, mobility</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            T
+                        </div>
+                        <div>
+                            <p class="font-medium">Leg Day</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Quads, hamstrings, calves</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            F
+                        </div>
+                        <div>
+                            <p class="font-medium">Upper Body</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Compound movements</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex">
+                        <div class="bg-gray-100 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            S
+                        </div>
+                        <div>
+                            <p class="font-medium">Rest Day</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Full recovery</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="flex">
+                        <div class="bg-yellow-100 text-yellow-800 rounded-full w-8 h-8 flex items-center justify-center font-medium mr-3">
+                            S
+                        </div>
+                        <div>
+                            <p class="font-medium">Active Recovery</p>
+                            <p class="text-xs text-gray-500 mt-1">Focus: Mobility, light cardio</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- iOS Tab Bar -->
+        <div class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-home"></i></div>
+                <div>Home</div>
+            </a>
+            <a href="exercise_library.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-dumbbell"></i></div>
+                <div>Exercises</div>
+            </a>
+            <a href="workout_log.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-plus-circle"></i></div>
+                <div>Log</div>
+            </a>
+            <a href="history.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>History</div>
+            </a>
+            <a href="feedback.html" class="tab-item active">
+                <div class="tab-icon"><i class="fas fa-robot"></i></div>
+                <div>AI Coach</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                const now = new Date();
+                // Get current hours and minutes based on your local time
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                
+                // Format minutes to always be two digits (e.g., 05 instead of 5)
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                // Format hours to 12-hour format if desired, or keep 24-hour
+                // For 12-hour format with AM/PM (optional):
+                // const ampm = hours >= 12 ? 'PM' : 'AM';
+                // hours = hours % 12;
+                // hours = hours ? hours : 12; // the hour '0' should be '12'
+                // timeElement.textContent = hours + ':' + minutes + ' ' + ampm;
+
+                // For 24-hour format (like iOS default in many regions)
+                // Ensure hours are also two digits if you prefer (e.g. 09:41)
+                // hours = hours < 10 ? '0' + hours : hours; // Optional for leading zero on hour
+                timeElement.textContent = hours + ':' + minutes;
+            }
+        }
+
+        // Update the time when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            // Update the time every minute (60000 milliseconds)
+            setInterval(updateTime, 60000); 
+        });
+    </script>
+
+
+</body>
+</html> 

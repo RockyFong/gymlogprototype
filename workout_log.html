@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Default (Mobile-first: Phones AND Tablets - Fullscreen) --- */
+        body {
+            margin: 0;
+            padding: 0; /* Ensures no padding for full screen on phones/tablets */
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 100vh; /* Full viewport height for phones/tablets */
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Framed View (Desktops and very large screens) --- */
+        /* THIS IS THE LINE TO CHANGE to ensure tablets are fullscreen */
+        @media (min-width: 1400px) { /* <--- Increased from 1025px */
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .phone-frame {
+                aspect-ratio: 390 / 844;
+                border-radius: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                max-width: 100%;
+                max-height: 100%;
+                width: 390px; 
+                height: auto;
+                position: relative;
+                display: flex; /* Ensure these are still set */
+                flex-direction: column; /* Ensure these are still set */
+                overflow: hidden; /* Ensure these are still set */
+            }
+
+            @media (orientation: landscape) {
+                .phone-frame {
+                    height: 100%; 
+                    width: auto;  
+                }
+            }
+
+            /* Optional: Larger simulation frame for very wide desktops if 390px base is too small */
+            /* This would only apply if min-width is also >= 1400px AND this new min-width (e.g., 1600px) is met */
+            /*
+            @media (min-width: 1600px) { 
+                .phone-frame {
+                    width: 450px; 
+                }
+            }
+            */
+        }
+
+        /* --- Original styles for inner components --- */
+        .status-bar {
+            height: 44px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            text-decoration: none;
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .tab-item.active {
+            color: #007aff;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .timer-button-black {
+            background: #111;
+            color: #fff;
+            border: none;
+            outline: none;
+            transition: background 0.2s;
+        }
+        .rest-time-btn.selected, .rest-time-btn:active {
+            background: #111 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="phone-frame">
+        <!-- Remove the global timer at the top (above the header) -->
+        
+        <!-- Content Area -->
+        <div class="content-area">
+            <div id="start-workout-container" class="mb-4"></div>
+            <!-- Header with the global timer next to 'Push Day', made sticky -->
+            <div class="flex justify-between items-center mb-4 sticky top-0 bg-white z-20" style="padding-top: 1rem;">
+                <h1 class="text-2xl font-bold">Push Day</h1>
+                <!-- Add the black pill global timer here -->
+                <span id="global-workout-timer" class="text-base font-mono bg-black text-white px-3 py-1 rounded-full shadow ml-auto">00:00:00</span>
+            </div>
+
+            <!-- Timer Card -->
+            <div class="workout-card mb-5 p-4 relative">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-medium">Rest Timer</h2>
+                        <p class="text-sm text-gray-500">Between sets</p>
+                    </div>
+                    <!-- Rest Timer Button: Ensure no down arrow -->
+                    <button id="rest-timer-btn" class="timer-button-black rounded-full w-14 h-14 flex items-center justify-center">
+                        <span id="rest-timer-display" class="text-xl font-medium">00:00</span>
+                    </button>
+                </div>
+                <div class="flex justify-between mt-3">
+                    <button class="rest-time-btn bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs" data-seconds="30">30s</button>
+                    <button class="rest-time-btn bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs" data-seconds="60">60s</button>
+                    <button class="rest-time-btn bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs" data-seconds="90">90s</button>
+                    <button class="rest-time-btn bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs" data-seconds="120">120s</button>
+                    <button class="rest-time-btn bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs" data-seconds="180">180s</button>
+                </div>
+            </div>
+
+            <!-- Current Exercise -->
+            <h2 class="font-semibold text-lg mb-3">Current Exercise</h2>
+            <div class="workout-card mb-5">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Bench Press</h3>
+                            <p class="text-sm text-gray-500">Barbell • Chest</p>
+                        </div>
+                        <button class="bg-gray-100 text-gray-600 rounded-full p-2">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Headers -->
+                <div class="flex px-4 py-2 text-xs text-gray-500 bg-gray-50">
+                    <div class="w-10 text-center">SET</div>
+                    <div class="flex-1 text-center">PREVIOUS</div>
+                    <div class="w-16 text-center">WEIGHT</div>
+                    <div class="w-12 text-center">REPS</div>
+                    <div class="w-10 text-center"></div>
+                </div>
+
+                <!-- Set 1 (Completed) -->
+                <div class="set-row flex items-center px-4 py-3">
+                    <div class="w-10 text-center font-medium">1</div>
+                    <div class="flex-1 text-center text-xs text-gray-500">135 lb × 12</div>
+                    <div class="w-16 text-center">
+                        <input type="text" value="135" class="number-input" disabled>
+                    </div>
+                    <div class="w-12 text-center">
+                        <input type="text" value="12" class="number-input" disabled>
+                    </div>
+                    <div class="w-10 text-center">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                </div>
+
+                <!-- Set 2 (Completed) -->
+                <div class="set-row flex items-center px-4 py-3">
+                    <div class="w-10 text-center font-medium">2</div>
+                    <div class="flex-1 text-center text-xs text-gray-500">155 lb × 10</div>
+                    <div class="w-16 text-center">
+                        <input type="text" value="155" class="number-input" disabled>
+                    </div>
+                    <div class="w-12 text-center">
+                        <input type="text" value="10" class="number-input" disabled>
+                    </div>
+                    <div class="w-10 text-center">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                </div>
+
+                <!-- Set 3 (Current) -->
+                <div class="set-row flex items-center px-4 py-3 bg-blue-50">
+                    <div class="w-10 text-center font-medium">3</div>
+                    <div class="flex-1 text-center text-xs text-gray-500">155 lb × 8</div>
+                    <div class="w-16 text-center">
+                        <input type="text" value="155" class="number-input border-blue-400">
+                    </div>
+                    <div class="w-12 text-center">
+                        <input type="text" value="8" class="number-input border-blue-400">
+                    </div>
+                    <div class="w-10 text-center">
+                        <button class="bg-blue-500 rounded-full w-7 h-7 flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Set 4 (Future) -->
+                <div class="set-row flex items-center px-4 py-3">
+                    <div class="w-10 text-center font-medium">4</div>
+                    <div class="flex-1 text-center text-xs text-gray-500">155 lb × 8</div>
+                    <div class="w-16 text-center">
+                        <input type="text" value="155" class="number-input" disabled>
+                    </div>
+                    <div class="w-12 text-center">
+                        <input type="text" value="8" class="number-input" disabled>
+                    </div>
+                    <div class="w-10 text-center text-gray-300">
+                        <i class="far fa-circle"></i>
+                    </div>
+                </div>
+
+                <!-- Set 5 (Future) -->
+                <div class="set-row flex items-center px-4 py-3">
+                    <div class="w-10 text-center font-medium">5</div>
+                    <div class="flex-1 text-center text-xs text-gray-500">135 lb × 10</div>
+                    <div class="w-16 text-center">
+                        <input type="text" value="135" class="number-input" disabled>
+                    </div>
+                    <div class="w-12 text-center">
+                        <input type="text" value="10" class="number-input" disabled>
+                    </div>
+                    <div class="w-10 text-center text-gray-300">
+                        <i class="far fa-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise List -->
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-semibold text-lg">Workout Plan</h2>
+                <button class="text-blue-500 text-sm">+ Add Exercise</button>
+            </div>
+
+            <!-- Next Exercise -->
+            <div class="workout-card mb-3 p-4 flex items-center">
+                <div class="flex-1">
+                    <h3 class="font-medium">Incline Bench Press</h3>
+                    <p class="text-sm text-gray-500">Dumbbell • Chest • 4 sets</p>
+                </div>
+                <button class="bg-gray-100 text-gray-600 rounded-full p-2">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- More Exercises -->
+            <div class="workout-card mb-3 p-4 flex items-center">
+                <div class="flex-1">
+                    <h3 class="font-medium">Shoulder Press</h3>
+                    <p class="text-sm text-gray-500">Machine • Shoulders • 3 sets</p>
+                </div>
+                <button class="bg-gray-100 text-gray-600 rounded-full p-2">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="workout-card mb-3 p-4 flex items-center">
+                <div class="flex-1">
+                    <h3 class="font-medium">Tricep Pushdown</h3>
+                    <p class="text-sm text-gray-500">Cable • Arms • 4 sets</p>
+                </div>
+                <button class="bg-gray-100 text-gray-600 rounded-full p-2">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="workout-card mb-5 p-4 flex items-center">
+                <div class="flex-1">
+                    <h3 class="font-medium">Lateral Raises</h3>
+                    <p class="text-sm text-gray-500">Dumbbell • Shoulders • 3 sets</p>
+                </div>
+                <button class="bg-gray-100 text-gray-600 rounded-full p-2">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Finish Button -->
+            <a href="workout_summary.html" class="block w-full no-underline">
+                <button id="finish-workout-btn" class="w-full bg-blue-500 text-white py-3 rounded-full font-semibold mb-5 hover:bg-blue-600 active:bg-blue-700 transition-colors duration-150">
+                    Finish Workout
+                </button>
+            </a>
+        </div>
+
+        <!-- iOS Tab Bar -->
+        <div class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-home"></i></div>
+                <div>Home</div>
+            </a>
+            <a href="exercise_library.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-dumbbell"></i></div>
+                <div>Exercises</div>
+            </a>
+            <a href="workout_log.html" class="tab-item active">
+                <div class="tab-icon"><i class="fas fa-plus-circle"></i></div>
+                <div>Log</div>
+            </a>
+            <a href="history.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>History</div>
+            </a>
+            <a href="feedback.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-robot"></i></div>
+                <div>AI Coach</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Combine all scripts into one block -->
+    <script>
+        // --- REST TIMER LOGIC ---
+        const restTimerBtn = document.getElementById('rest-timer-btn');
+        const restTimerDisplay = document.getElementById('rest-timer-display');
+        const restTimeBtns = document.querySelectorAll('.rest-time-btn');
+        let selectedRestSeconds = 120; // default
+        let restCountdownInterval = null;
+        let isRestTimerEnabled = false;
+
+        function updateRestTimerDisplay(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            restTimerDisplay.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        function startRestCountdown(seconds) {
+            if (!isRestTimerEnabled) return; // Prevent start if not enabled
+            clearInterval(restCountdownInterval);
+            let endTime = Date.now() + seconds * 1000;
+            localStorage.setItem('restTimerEnd', endTime);
+            updateRestTimerDisplay(seconds);
+            restCountdownInterval = setInterval(() => {
+                const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+                updateRestTimerDisplay(remaining);
+                if (remaining <= 0) {
+                    clearRestTimer();
+                } else {
+                    localStorage.setItem('restTimerEnd', endTime); // Keep updating end time
+                }
+            }, 250);
+        }
+
+        function clearRestTimer() {
+            clearInterval(restCountdownInterval);
+            restCountdownInterval = null;
+            localStorage.removeItem('restTimerEnd');
+            updateRestTimerDisplay(0); // Reset to 00:00 if disabled
+        }
+
+        // Add the loadRestTimerFromStorage function
+        function loadRestTimerFromStorage() {
+            const storedEndTime = localStorage.getItem('restTimerEnd');
+            if (storedEndTime) {
+                const remaining = Math.max(0, Math.floor((parseInt(storedEndTime, 10) - Date.now()) / 1000));
+                if (remaining > 0) {
+                    startRestCountdown(remaining);
+                } else {
+                    clearRestTimer();
+                }
+            }
+        }
+
+        restTimeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!isRestTimerEnabled) return; // Only allow selection if enabled
+                restTimeBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedRestSeconds = parseInt(btn.getAttribute('data-seconds'));
+                if (!restCountdownInterval) updateRestTimerDisplay(selectedRestSeconds);
+            });
+        });
+
+        if (restTimerBtn) {
+            restTimerBtn.addEventListener('click', () => {
+                if (isRestTimerEnabled && !restCountdownInterval) {
+                    startRestCountdown(selectedRestSeconds);
+                }
+            });
+        }
+
+        // --- GLOBAL WORKOUT COUNT-UP TIMER LOGIC ---
+        const globalWorkoutTimer = document.getElementById('global-workout-timer');
+        let globalWorkoutInterval = null;
+
+        function formatGlobalTimeValue(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function updateGlobalWorkoutTimerDisplay() {
+            const storedStartTime = localStorage.getItem('gymLogWorkoutStartTime');
+            const isWorkoutActive = localStorage.getItem('isGymLogWorkoutActive') === 'true';
+            if (globalWorkoutTimer) {
+                if (isWorkoutActive && storedStartTime) {
+                    const startTime = parseInt(storedStartTime, 10);
+                    const currentTime = Date.now();
+                    const elapsedTimeInSeconds = Math.max(0, Math.floor((currentTime - startTime) / 1000));
+                    const hours = Math.floor(elapsedTimeInSeconds / 3600);
+                    const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
+                    const seconds = elapsedTimeInSeconds % 60;
+                    globalWorkoutTimer.textContent = `${formatGlobalTimeValue(hours)}:${formatGlobalTimeValue(minutes)}:${formatGlobalTimeValue(seconds)}`;
+                } else {
+                    globalWorkoutTimer.textContent = '00:00:00';
+                }
+            }
+        }
+
+        function initializeGlobalWorkoutTimer() {
+            if (globalWorkoutInterval) clearInterval(globalWorkoutInterval);
+            updateGlobalWorkoutTimerDisplay();
+             // Only start interval if workout is active, otherwise just show initial state
+             if (localStorage.getItem('isGymLogWorkoutActive') === 'true') {
+                globalWorkoutInterval = setInterval(updateGlobalWorkoutTimerDisplay, 1000);
+             }
+        }
+
+        // --- WORKOUT SESSION MANAGEMENT (START/FINISH) ---
+        function startNewWorkoutSessionGlobally() {
+            console.log("Attempting to start new global workout session...");
+            const now = Date.now();
+            localStorage.setItem('gymLogWorkoutStartTime', now.toString());
+            localStorage.setItem('isGymLogWorkoutActive', 'true');
+            initializeStates(); // Re-initialize timers when workout state changes
+            console.log("New global workout session started at: " + new Date(now));
+        }
+
+        function finishWorkoutSessionGlobally() {
+            console.log("Attempting to finish global workout session...");
+            localStorage.removeItem('gymLogWorkoutStartTime');
+            localStorage.removeItem('isGymLogWorkoutActive');
+            localStorage.removeItem('restTimerEnd'); // Also clear rest timer on workout finish
+            initializeStates(); // Re-initialize timers when workout state changes
+             console.log("Global workout session data cleared.");
+        }
+
+        // --- UI INITIALIZATION AND EVENT LISTENERS ---
+        function showStartWorkoutButtonIfNeeded() {
+            const container = document.getElementById('start-workout-container');
+            const isWorkoutActive = localStorage.getItem('isGymLogWorkoutActive') === 'true';
+            if (!isWorkoutActive) {
+                container.innerHTML = '<button id="start-workout-btn" class="w-full bg-green-500 text-white py-3 rounded-full font-semibold mb-5 hover:bg-green-600 active:bg-green-700 transition-colors duration-150">Start Workout</button>';
+                const startButton = document.getElementById('start-workout-btn');
+                 if (startButton) {
+                    startButton.addEventListener('click', function() {
+                        startNewWorkoutSessionGlobally();
+                        // showStartWorkoutButtonIfNeeded(); // State change will handle this
+                    });
+                 }
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        // Main initialization function called on DOMContentLoaded and storage events
+        function initializeStates() {
+            const isWorkoutActive = localStorage.getItem('isGymLogWorkoutActive') === 'true';
+
+            // Initialize Start/Finish button visibility
+            showStartWorkoutButtonIfNeeded();
+
+            // Initialize Global Workout Timer
+            initializeGlobalWorkoutTimer();
+
+            // Initialize Rest Timer state and display
+            if (isWorkoutActive) {
+                isRestTimerEnabled = true;
+                restTimeBtns.forEach(btn => btn.classList.remove('day-inactive'));
+                loadRestTimerFromStorage(); // This will either load ongoing or set selected time
+            } else {
+                isRestTimerEnabled = false;
+                restTimeBtns.forEach(btn => btn.classList.add('day-inactive'));
+                updateRestTimerDisplay(0); // Show 00:00
+                clearRestTimer(); // Ensure no interval is running
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeStates();
+
+            // Listen for storage changes to sync state if workout starts/ends elsewhere
+             window.addEventListener('storage', function(e) {
+                 if (e.key === 'isGymLogWorkoutActive' || e.key === 'gymLogWorkoutStartTime' || e.key === 'restTimerEnd') {
+                     initializeStates(); // Re-initialize all states on storage change
+                 }
+             });
+
+             // Wire up finish button (already done, but ensure it calls the consolidated function)
+             const finishBtn = document.getElementById('finish-workout-btn');
+             if (finishBtn) {
+                 finishBtn.removeEventListener('click', finishWorkoutSessionGlobally); // Remove potential old listeners
+                 finishBtn.addEventListener('click', function(e) {
+                     // Prevent default navigation if needed, but the function handles state change
+                     // e.preventDefault(); // Uncomment if you don't want the link to navigate immediately
+                     finishWorkoutSessionGlobally();
+                     // If not preventing default, navigation will happen after state is cleared
+                 });
+             }
+        });
+
+    </script>
+
+</body>
+</html> 

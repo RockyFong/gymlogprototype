@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Default (Mobile-first: Phones AND Tablets - Fullscreen) --- */
+        body {
+            margin: 0;
+            padding: 0; /* Ensures no padding for full screen on phones/tablets */
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 100vh; /* Full viewport height for phones/tablets */
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Framed View (Desktops and very large screens) --- */
+        /* THIS IS THE LINE TO CHANGE to ensure tablets are fullscreen */
+        @media (min-width: 1400px) { /* <--- Increased from 1025px */
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .phone-frame {
+                aspect-ratio: 390 / 844;
+                border-radius: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                max-width: 100%;
+                max-height: 100%;
+                width: 390px; 
+                height: auto;
+                position: relative;
+                display: flex; /* Ensure these are still set */
+                flex-direction: column; /* Ensure these are still set */
+                overflow: hidden; /* Ensure these are still set */
+            }
+
+            @media (orientation: landscape) {
+                .phone-frame {
+                    height: 100%; 
+                    width: auto;  
+                }
+            }
+
+            /* Optional: Larger simulation frame for very wide desktops if 390px base is too small */
+            /* This would only apply if min-width is also >= 1400px AND this new min-width (e.g., 1600px) is met */
+            /*
+            @media (min-width: 1600px) { 
+                .phone-frame {
+                    width: 450px; 
+                }
+            }
+            */
+        }
+
+        /* --- Original styles for inner components --- */
+        .status-bar {
+            height: 44px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            text-decoration: none;
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .tab-item.active {
+            color: #007aff;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="phone-frame">
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Statistics</h1>
+                <div class="flex space-x-2">
+                    <button class="bg-gray-200 rounded-full p-2">
+                        <i class="fas fa-calendar-alt text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Date Range Selector -->
+            <div class="flex bg-gray-200 rounded-lg p-1 mb-5">
+                <button class="flex-1 py-2 text-center text-sm font-medium text-gray-600">
+                    Week
+                </button>
+                <button class="flex-1 py-2 text-center text-sm font-medium bg-white rounded-md shadow">
+                    Month
+                </button>
+                <button class="flex-1 py-2 text-center text-sm font-medium text-gray-600">
+                    Year
+                </button>
+                <button class="flex-1 py-2 text-center text-sm font-medium text-gray-600">
+                    All
+                </button>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-2 gap-4 mb-5">
+                <div class="stats-card p-4">
+                    <h3 class="text-sm text-gray-500 mb-2">Workouts</h3>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold mr-2">16</span>
+                        <span class="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
+                            <i class="fas fa-arrow-up mr-1"></i>4
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">vs. previous month</p>
+                </div>
+                
+                <div class="stats-card p-4">
+                    <h3 class="text-sm text-gray-500 mb-2">Total Volume</h3>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold mr-2">156K</span>
+                        <span class="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
+                            <i class="fas fa-arrow-up mr-1"></i>12%
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">in pounds</p>
+                </div>
+                
+                <div class="stats-card p-4">
+                    <h3 class="text-sm text-gray-500 mb-2">Workout Time</h3>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold mr-2">14.5h</span>
+                        <span class="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
+                            <i class="fas fa-arrow-up mr-1"></i>2.2h
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">this month</p>
+                </div>
+                
+                <div class="stats-card p-4">
+                    <h3 class="text-sm text-gray-500 mb-2">PRs Set</h3>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold mr-2">7</span>
+                        <span class="text-xs text-green-500 bg-green-50 px-2 py-1 rounded-full">
+                            <i class="fas fa-arrow-up mr-1"></i>3
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">this month</p>
+                </div>
+            </div>
+            
+            <!-- Workout Frequency Chart -->
+            <h2 class="font-semibold text-lg mb-3">Workout Frequency</h2>
+            <div class="stats-card p-4 mb-5">
+                <div class="chart-container relative h-48">
+                    <!-- SVG container for the line graph -->
+                    <svg id="workout-frequency-chart" class="w-full h-full" viewBox="0 0 300 180" preserveAspectRatio="none">
+                        <!-- Example grid lines (can be drawn with SVG too) -->
+                        <!-- You might need to adjust these based on your data range and desired visual -->
+                        <line x1="0" y1="150" x2="300" y2="150" stroke="#e5e7eb" stroke-width="1"></line>
+                        <line x1="0" y1="100" x2="300" y2="100" stroke="#e5e7eb" stroke-width="1"></line>
+                        <line x1="0" y1="50" x2="300" y2="50" stroke="#e5e7eb" stroke-width="1"></line>
+
+                        <!-- Example Line (replace points with dynamic data) -->
+                        <!-- Points are (x, y) where y=0 is bottom, y=180 is top of viewBox -->
+                        <!-- Example Data: (0, 150), (40, 80), (80, 120), (120, 60), (160, 100), (200, 160), (240, 130), (280, 90) -->
+                        <polyline fill="none" stroke="#007aff" stroke-width="2" points="0,150 40,80 80,120 120,60 160,100 200,160 240,130 280,90"></polyline>
+
+                        <!-- Example Data Points (replace positions with dynamic data) -->
+                        <!-- Circles for data points -->
+                        <circle cx="0" cy="150" r="4" fill="#007aff"></circle>
+                        <circle cx="40" cy="80" r="4" fill="#007aff"></circle>
+                        <circle cx="80" cy="120" r="4" fill="#007aff"></circle>
+                        <circle cx="120" cy="60" r="4" fill="#007aff"></circle>
+                        <circle cx="160" cy="100" r="4" fill="#007aff"></circle>
+                        <circle cx="200" cy="160" r="4" fill="#007aff"></circle>
+                        <circle cx="240" cy="130" r="4" fill="#007aff"></circle>
+                        <circle cx="280" cy="90" r="4" fill="#007aff"></circle>
+                    </svg>
+                </div>
+                <div class="mt-2 text-center text-xs text-gray-500">Last 8 weeks</div>
+            </div>
+            
+            <!-- Body Parts Distribution -->
+            <h2 class="font-semibold text-lg mb-3">Body Parts Focus</h2>
+            <div class="stats-card p-4 mb-5">
+                <div class="flex flex-wrap">
+                    <div class="w-1/2 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="metric-circle mb-2">
+                                <span class="metric-value">35%</span>
+                            </div>
+                            <span class="text-sm font-medium">Chest</span>
+                        </div>
+                    </div>
+                    <div class="w-1/2 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="metric-circle mb-2" style="background: conic-gradient(#5ac8fa 0% 25%, #e9ecef 25% 100%);">
+                                <span class="metric-value">25%</span>
+                            </div>
+                            <span class="text-sm font-medium">Back</span>
+                        </div>
+                    </div>
+                    <div class="w-1/2 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="metric-circle mb-2" style="background: conic-gradient(#4cd964 0% 20%, #e9ecef 20% 100%);">
+                                <span class="metric-value">20%</span>
+                            </div>
+                            <span class="text-sm font-medium">Legs</span>
+                        </div>
+                    </div>
+                    <div class="w-1/2 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="metric-circle mb-2" style="background: conic-gradient(#ff9500 0% 10%, #e9ecef 10% 100%);">
+                                <span class="metric-value">10%</span>
+                            </div>
+                            <span class="text-sm font-medium">Arms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Exercises -->
+            <h2 class="font-semibold text-lg mb-3">Top Exercises</h2>
+            <div class="stats-card mb-5">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Bench Press</h3>
+                            <p class="text-xs text-gray-500 mt-1">Max: 185 lbs × 8 reps</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium">24,750 lbs</span>
+                            <span class="text-xs text-gray-500">Total volume</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Squats</h3>
+                            <p class="text-xs text-gray-500 mt-1">Max: 245 lbs × 5 reps</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium">22,100 lbs</span>
+                            <span class="text-xs text-gray-500">Total volume</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Deadlifts</h3>
+                            <p class="text-xs text-gray-500 mt-1">Max: 315 lbs × 3 reps</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium">18,450 lbs</span>
+                            <span class="text-xs text-gray-500">Total volume</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Pull-ups</h3>
+                            <p class="text-xs text-gray-500 mt-1">Max: BW+25 lbs × 10 reps</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium">15,200 lbs</span>
+                            <span class="text-xs text-gray-500">Total volume</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium">Shoulder Press</h3>
+                            <p class="text-xs text-gray-500 mt-1">Max: 135 lbs × 6 reps</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium">14,380 lbs</span>
+                            <span class="text-xs text-gray-500">Total volume</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Goal Progress -->
+            <h2 class="font-semibold text-lg mb-3">Goal Progress</h2>
+            <div class="stats-card p-4 mb-5">
+                <div class="mb-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium">Bench Press: 225 lbs × 5 reps</span>
+                        <span class="text-sm text-gray-600">82%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill bg-blue-500" style="width: 82%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium">Squat: 315 lbs × 5 reps</span>
+                        <span class="text-sm text-gray-600">75%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill bg-blue-500" style="width: 75%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium">Weekly workouts: 5</span>
+                        <span class="text-sm text-gray-600">80%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill bg-blue-500" style="width: 80%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- iOS Tab Bar -->
+        <div class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-home"></i></div>
+                <div>Home</div>
+            </a>
+            <a href="exercise_library.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-dumbbell"></i></div>
+                <div>Exercises</div>
+            </a>
+            <a href="workout_log.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-plus-circle"></i></div>
+                <div>Log</div>
+            </a>
+            <a href="history.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>History</div>
+            </a>
+            <a href="feedback.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-robot"></i></div>
+                <div>AI Coach</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                const now = new Date();
+                // Get current hours and minutes based on your local time
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                
+                // Format minutes to always be two digits (e.g., 05 instead of 5)
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                // Format hours to 12-hour format if desired, or keep 24-hour
+                // For 12-hour format with AM/PM (optional):
+                // const ampm = hours >= 12 ? 'PM' : 'AM';
+                // hours = hours % 12;
+                // hours = hours ? hours : 12; // the hour '0' should be '12'
+                // timeElement.textContent = hours + ':' + minutes + ' ' + ampm;
+
+                // For 24-hour format (like iOS default in many regions)
+                // Ensure hours are also two digits if you prefer (e.g. 09:41)
+                // hours = hours < 10 ? '0' + hours : hours; // Optional for leading zero on hour
+                timeElement.textContent = hours + ':' + minutes;
+            }
+        }
+
+        // Update the time when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            // Update the time every minute (60000 milliseconds)
+            setInterval(updateTime, 60000); 
+        });
+    </script>
+
+</body>
+</html> 

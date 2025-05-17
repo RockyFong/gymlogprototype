@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            padding: 2rem;
+        }
+        .screen-container {
+            width: 390px; /* iPhone 15 Pro width */
+            margin: 2rem auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 844px; /* iPhone 15 Pro height */
+            border: none;
+        }
+        .screen-label {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">GymLog App Prototype</h1>
+        <p class="text-center mb-12">A bodybuilding workout tracking app with local data storage</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div>
+                <div class="screen-label">Home Dashboard</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=index.html" title="Home Dashboard"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">Exercise Library</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=exercise_library.html" title="Exercise Library"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">Workout Log</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=workout_log.html" title="Workout Log"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">Workout Summary</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=workout_summary.html" title="Workout Summary"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">History</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=history.html" title="History"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">AI Feedback</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=feedback.html" title="AI Feedback"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">Stats</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=stats.html" title="Stats"></iframe>
+                </div>
+            </div>
+            
+            <div>
+                <div class="screen-label">Settings</div>
+                <div class="screen-container">
+                    <iframe src="grid_template.html?page=settings.html" title="Settings"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

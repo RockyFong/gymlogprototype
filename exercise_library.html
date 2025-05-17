@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Default (Mobile-first: Phones AND Tablets - Fullscreen) --- */
+        body {
+            margin: 0;
+            padding: 0; /* Ensures no padding for full screen on phones/tablets */
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 100vh; /* Full viewport height for phones/tablets */
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Framed View (Desktops and very large screens) --- */
+        /* THIS IS THE LINE TO CHANGE to ensure tablets are fullscreen */
+        @media (min-width: 1400px) { /* <--- Increased from 1025px */
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .phone-frame {
+                aspect-ratio: 390 / 844;
+                border-radius: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                max-width: 100%;
+                max-height: 100%;
+                width: 390px; 
+                height: auto;
+                position: relative;
+                display: flex; /* Ensure these are still set */
+                flex-direction: column; /* Ensure these are still set */
+                overflow: hidden; /* Ensure these are still set */
+            }
+
+            @media (orientation: landscape) {
+                .phone-frame {
+                    height: 100%; 
+                    width: auto;  
+                }
+            }
+
+            /* Optional: Larger simulation frame for very wide desktops if 390px base is too small */
+            /* This would only apply if min-width is also >= 1400px AND this new min-width (e.g., 1600px) is met */
+            /*
+            @media (min-width: 1600px) { 
+                .phone-frame {
+                    width: 450px; 
+                }
+            }
+            */
+        }
+
+        /* --- Original styles for inner components --- */
+        .status-bar {
+            height: 44px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            text-decoration: none;
+            flex: 1;
+            padding-top: 5px;
+        }
+
+        .tab-item.active {
+            color: #007aff;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="phone-frame">
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Header -->
+            <h1 class="text-2xl font-bold mb-4">Exercise Library</h1>
+            
+            <!-- Search Bar -->
+            <div class="relative mb-6">
+                <input type="text" placeholder="Search exercises" class="w-full py-3 pl-10 pr-4 bg-white rounded-full shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+            </div>
+            
+            <!-- Category Filters -->
+            <div class="flex overflow-x-auto pb-2 mb-4 -mx-1">
+                <div class="px-1">
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap">All</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Chest</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Back</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Shoulders</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Arms</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Legs</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Abs</button>
+                </div>
+                <div class="px-1">
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-full text-sm whitespace-nowrap">Full Body</button>
+                </div>
+            </div>
+            
+            <!-- Exercise Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Exercise 1 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Bench Press" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Bench Press</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Chest • Barbell</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>Favorite</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Bench Press" data-category="Chest" data-equipment="Barbell">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 2 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Squats" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Barbell Squat</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Legs • Barbell</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Barbell Squat" data-category="Legs" data-equipment="Barbell">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 3 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Deadlift" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Deadlift</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Back • Barbell</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span>Favorite</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Deadlift" data-category="Back" data-equipment="Barbell">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 4 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Shoulder Press" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Shoulder Press</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Shoulders • Dumbbell</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Shoulder Press" data-category="Shoulders" data-equipment="Dumbbell">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 5 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1603287681836-b174ce5074c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Pull-up" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Pull-up</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Back • Bodyweight</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Pull-up" data-category="Back" data-equipment="Bodyweight">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 6 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Leg Press" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm exercise-name">Leg Press</h3>
+                        <p class="text-xs text-gray-500 exercise-details">Legs • Machine</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                        <button class="mt-2 w-full bg-green-500 text-white py-1 rounded-full text-xs add-exercise-btn" data-name="Leg Press" data-category="Legs" data-equipment="Machine">Quick Add</button>
+                    </div>
+                </div>
+                
+                <!-- Exercise 7 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1571019613576-2b22c76fd955?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Bicep Curl" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm">Bicep Curl</h3>
+                        <p class="text-xs text-gray-500">Arms • Dumbbell</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Exercise 8 -->
+                <div class="exercise-card">
+                    <img src="https://images.unsplash.com/photo-1598971639058-a1044d7e8c26?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Tricep Extension" class="exercise-image">
+                    <div class="p-3">
+                        <h3 class="font-medium text-sm">Tricep Extension</h3>
+                        <p class="text-xs text-gray-500">Arms • Cable</p>
+                        <div class="mt-1 flex items-center text-xs text-gray-400">
+                            <i class="fas fa-star text-gray-300 mr-1"></i>
+                            <span>Add to favorites</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- iOS Tab Bar -->
+        <div class="tab-bar">
+            <a href="index.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-home"></i></div>
+                <div>Home</div>
+            </a>
+            <a href="exercise_library.html" class="tab-item active">
+                <div class="tab-icon"><i class="fas fa-dumbbell"></i></div>
+                <div>Exercises</div>
+            </a>
+            <a href="workout_log.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-plus-circle"></i></div>
+                <div>Log</div>
+            </a>
+            <a href="history.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>History</div>
+            </a>
+            <a href="feedback.html" class="tab-item">
+                <div class="tab-icon"><i class="fas fa-robot"></i></div>
+                <div>AI Coach</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const timeElement = document.getElementById('current-time');
+            if (timeElement) {
+                const now = new Date();
+                // Get current hours and minutes based on your local time
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                
+                // Format minutes to always be two digits (e.g., 05 instead of 5)
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                // Format hours to 12-hour format if desired, or keep 24-hour
+                // For 12-hour format with AM/PM (optional):
+                // const ampm = hours >= 12 ? 'PM' : 'AM';
+                // hours = hours % 12;
+                // hours = hours ? hours : 12; // the hour '0' should be '12'
+                // timeElement.textContent = hours + ':' + minutes + ' ' + ampm;
+
+                // For 24-hour format (like iOS default in many regions)
+                // Ensure hours are also two digits if you prefer (e.g. 09:41)
+                // hours = hours < 10 ? '0' + hours : hours; // Optional for leading zero on hour
+                timeElement.textContent = hours + ':' + minutes;
+            }
+        }
+
+        // Update the time when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            // Update the time every minute (60000 milliseconds)
+            setInterval(updateTime, 60000); 
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButtons = document.querySelectorAll('.add-exercise-btn');
+
+            addButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const name = button.dataset.name;
+                    const category = button.dataset.category;
+                    const equipment = button.dataset.equipment;
+
+                    // Retrieve current workout exercises from localStorage
+                    let currentWorkoutExercises = JSON.parse(localStorage.getItem('currentWorkoutExercises') || '[]');
+
+                    // Create a new exercise object
+                    const newExercise = {
+                        id: Date.now(), // Simple unique ID
+                        name: name,
+                        category: category,
+                        equipment: equipment,
+                        sets: [] // Start with no sets
+                    };
+
+                    // Add the new exercise
+                    currentWorkoutExercises.push(newExercise);
+
+                    // Save back to localStorage
+                    localStorage.setItem('currentWorkoutExercises', JSON.stringify(currentWorkoutExercises));
+
+                    // Optional: Provide visual feedback
+                    button.textContent = 'Added!';
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-gray-400');
+                    button.disabled = true; // Prevent adding the same exercise multiple times quickly
+
+                    console.log(`Added ${name} to workout.`);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html> 

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymLog - Workout History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Default (Mobile-first: Phones AND Tablets - Fullscreen) --- */
+        body {
+            margin: 0;
+            padding: 0; 
+            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 100vh; 
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1400px) { 
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            .phone-frame {
+                aspect-ratio: 390 / 844;
+                border-radius: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                max-width: 100%;
+                max-height: 100%;
+                width: 390px; 
+                height: auto;
+                position: relative;
+                display: flex; 
+                flex-direction: column; 
+                overflow: hidden; 
+            }
+            @media (orientation: landscape) {
+                .phone-frame { height: 100%; width: auto; }
+            }
+        }
+
+        .status-bar {
+            height: 44px; background-color: #000; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 20px; color: white;
+            font-size: 14px; font-weight: 600; flex-shrink: 0;
+        }
+        .tab-bar {
+            height: 83px; background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around;
+            align-items: center; padding-bottom: 20px; flex-shrink: 0; width: 100%;
+        }
+        .tab-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #8e8e93; font-size: 10px; text-decoration: none;
+            flex: 1; padding-top: 5px;
+        }
+        .tab-item.active { color: #007aff; }
+        .tab-icon { font-size: 22px; margin-bottom: 4px; }
+        .content-area {
+            flex-grow: 1; overflow-y: auto; background-color: #f8f8f8;
+            -webkit-overflow-scrolling: touch; padding: 20px;
+        }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+
+
+
+        /* Calendar specific styles */
+        .calendar-day-cell {
+            width: 2.5rem;  /* ADDED: Make width equal to height for a circle */
+            height: 2.5rem; /* h-10 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; /* Makes the background circular */
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s; /* Added color transition */
+            font-size: 0.875rem; /* text-sm */
+            /* Ensure text doesn't cause overflow if cell is small */
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .calendar-day-cell:not(.day-inactive):not(.day-today):hover { /* Apply hover only to active month days not today */
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+            color: #1f2937; /* Tailwind gray-800 for better contrast on hover */
+        }
+        .day-inactive { /* For days not in the current month */
+            color: #9ca3af; /* Tailwind gray-400 */
+            cursor: default;
+        }
+        .day-inactive:hover { /* Prevent hover effect on inactive days */
+            background-color: transparent;
+        }
+        .day-today {
+            background-color: #3b82f6 !important; /* Tailwind blue-500 */
+            color: white !important; 
+            font-weight: bold;
+        }
+        .day-today:hover { /* Optional: different hover for today if needed */
+             background-color: #2563eb !important; /* Darker blue for hover on today */
+        }
+        .day-has-workout {
+            position: relative;
+        }
+        .day-has-workout::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background-color: #10b981; /* Tailwind green-500 - for workout indicator */
+            border-radius: 50%;
+            z-index: 1; /* Ensure dot is above background if needed */
+        }
+        /* Ensure dot is visible on "today" if it also has a workout */
+        .day-today.day-has-workout::after {
+            background-color: white; 
+        }
+
+
+
+
+        .history-card { /* Copied from your previous .stat-card for consistency for workout list items */
+             background: white; border-radius: 12px; /* Slightly less rounded than stat-card */
+             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .workout-intensity-indicator {
+            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+            border-top-left-radius: 12px; border-bottom-left-radius: 12px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="content-area">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Workout History</h1>
+                <div class="flex space-x-2">
+                    <button class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-search text-gray-600 text-xs"></i>
+                    </button>
+                    <button class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-filter text-gray-600 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex bg-gray-100 rounded-lg p-1 mb-5">
+                <button class="flex-1 py-2 text-center text-sm font-medium bg-white rounded-md shadow text-blue-600">
+                    Calendar
+                </button>
+                <button class="flex-1 py-2 text-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                    List
+                </button>
+            </div>
+            
+            <div class="flex justify-between items-center mb-4 px-2">
+                <button id="prev-month-btn" class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-chevron-left fa-xs"></i>
+                </button>
+                <h2 id="month-year-display" class="font-semibold text-base tabular-nums">Month Year</h2>
+                <button id="next-month-btn" class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-chevron-right fa-xs"></i>
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-3 sm:p-4 mb-5">
+                <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 mb-2">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="calendar-days-container" class="grid grid-cols-7 gap-1">
+                    {/* Days will be populated here */}
+                </div>
+            </div>
+            
+            <h2 class="font-semibold text-lg mb-3 mt-6">Recent Workouts</h2>
+            <div class="history-card mb-3 p-4 relative">
+                <div class="workout-intensity-indicator bg-blue-500"></div>
+                <div class="pl-3">
+                    <div class="flex justify-between items-center">
+                        <div><h3 class="font-medium">Push Day</h3><p class="text-sm text-gray-500">Today • 54 min</p></div>
+                        <div class="text-right"><p class="text-sm font-medium">11,320 lbs</p><p class="text-xs text-gray-500">Total volume</p></div>
+                    </div>
+                    <div class="flex flex-wrap mt-2">
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">Bench Press</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">Incline Bench</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">Shoulder Press</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mr-1 mb-1">+2 more</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="index.html" class="tab-item"><div class="tab-icon"><i class="fas fa-home"></i></div><div>Home</div></a>
+            <a href="exercise_library.html" class="tab-item"><div class="tab-icon"><i class="fas fa-dumbbell"></i></div><div>Exercises</div></a>
+            <a href="workout_log.html" class="tab-item"><div class="tab-icon"><i class="fas fa-plus-circle"></i></div><div>Log</div></a>
+            <a href="history.html" class="tab-item active"><div class="tab-icon"><i class="fas fa-calendar-alt"></i></div><div>History</div></a>
+            <a href="feedback.html" class="tab-item"><div class="tab-icon"><i class="fas fa-robot"></i></div><div>AI Coach</div></a>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Phone status bar time
+        const timeElement = document.getElementById('current-time');
+        function updateStatusBarTime() {
+            if (timeElement) {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                timeElement.textContent = hours + ':' + minutes;
+            }
+        }
+        if (timeElement) {
+            updateStatusBarTime();
+            setInterval(updateStatusBarTime, 60000);
+        }
+
+        // --- Interactive Calendar Logic ---
+        const monthYearDisplay = document.getElementById('month-year-display');
+        const calendarDaysContainer = document.getElementById('calendar-days-container');
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+
+        let currentDateState = new Date(); // Tracks the month/year being displayed
+
+        // Placeholder for workout data - in a real app, you'd fetch this
+        // Example: "YYYY-MM-DD"
+        const workoutData = {
+            "2025-05-03": { details: "Leg Day, 13000 lbs" },
+            "2025-05-05": { details: "Push Day, 11000 lbs" },
+            "2025-05-07": { details: "Pull Day, 9500 lbs"  },
+            "2025-05-10": { details: "Cardio" },
+            "2025-05-12": { details: "Rest" },
+            "2025-05-17": { details: "Full Body Workout" } // Example for current date
+        };
+
+        function renderCalendar(year, month_idx) { // month_idx is 0-11
+            currentDateState.setFullYear(year);
+            currentDateState.setMonth(month_idx);
+            currentDateState.setDate(1); // Important to avoid month overflow issues
+
+            if (monthYearDisplay) {
+                 monthYearDisplay.textContent = currentDateState.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            if (!calendarDaysContainer) return;
+            calendarDaysContainer.innerHTML = '';
+
+            const today = new Date(); // Actual current date
+            const firstDayOfMonth = new Date(year, month_idx, 1);
+            const daysInMonth = new Date(year, month_idx + 1, 0).getDate();
+            let startingDayOfWeek = firstDayOfMonth.getDay(); // 0 (Sun) - 6 (Sat)
+
+            // Calculate days from previous month to show
+            const prevMonthEndDate = new Date(year, month_idx, 0);
+            const daysInPrevMonth = prevMonthEndDate.getDate();
+
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const day = daysInPrevMonth - startingDayOfWeek + 1 + i;
+                const cell = createDayCell(day, true, false, false, null);
+                calendarDaysContainer.appendChild(cell);
+            }
+
+            // Days of current month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const isToday = (i === today.getDate() && month_idx === today.getMonth() && year === today.getFullYear());
+                const dateString = `${year}-${String(month_idx + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const hasWorkout = !!workoutData[dateString];
+                
+                const cell = createDayCell(i, false, isToday, hasWorkout, dateString);
+                calendarDaysContainer.appendChild(cell);
+            }
+
+            // Days from next month
+            const totalCellsRendered = startingDayOfWeek + daysInMonth;
+            const remainingCellsToFillGrid = (7 - (totalCellsRendered % 7)) % 7; // How many cells to fill the last week
+
+            for (let i = 1; i <= remainingCellsToFillGrid; i++) {
+                const cell = createDayCell(i, true, false, false, null);
+                calendarDaysContainer.appendChild(cell);
+            }
+        }
+
+        function createDayCell(dayNumber, isOtherMonth, isToday, hasWorkout, dateString) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day-cell p-1 text-sm'; // Base Tailwind classes can be added here
+            cell.textContent = dayNumber;
+
+            if (isOtherMonth) {
+                cell.classList.add('day-inactive', 'text-gray-300'); // Tailwind for lighter text
+            } else {
+                cell.classList.add('hover:bg-gray-100'); // Tailwind for hover
+                if (isToday) {
+                    cell.classList.add('day-today', 'bg-blue-500', 'text-white', 'font-bold');
+                }
+                if (hasWorkout) {
+                    cell.classList.add('day-has-workout');
+                    if (isToday) { // Ensure dot is visible on "today" if it also has a workout
+                        // The ::after pseudo-element will handle its own color based on .day-today
+                    }
+                }
+                if (dateString) {
+                    cell.dataset.date = dateString;
+                    cell.addEventListener('click', () => {
+                        alert(`Displaying workouts for: ${dateString}`);
+                        // Implement logic to show workouts for the selected date
+                        // This might involve filtering the "Recent Workouts" list below
+                        // or fetching detailed data.
+                    });
+                }
+            }
+            return cell;
+        }
+
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', () => {
+                currentDateState.setMonth(currentDateState.getMonth() - 1);
+                renderCalendar(currentDateState.getFullYear(), currentDateState.getMonth());
+            });
+        }
+
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', () => {
+                currentDateState.setMonth(currentDateState.getMonth() + 1);
+                renderCalendar(currentDateState.getFullYear(), currentDateState.getMonth());
+            });
+        }
+
+        // Initial render for the actual current month when the page loads
+        const now = new Date();
+        if (monthYearDisplay && calendarDaysContainer) { // Ensure elements exist before rendering
+             renderCalendar(now.getFullYear(), now.getMonth());
+        }
+    });
+    </script>
+</body>
+</html>
